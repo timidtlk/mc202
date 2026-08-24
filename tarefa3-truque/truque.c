@@ -16,8 +16,18 @@ int somar(int v[], int R[], int r, int inicio, int fim) {
     return soma;
 }
 
-void atualizar(int v[], int i, int x) {
+void atualizar(int v[], int r, int R[], int i, int x) {
+    int antigo = v[x];
+    int rI = (int) floor((double) i / r);
+
+    R[rI] += x - antigo;
+
     v[i] = x;
+    printf("\n");
+    for (i = 0; i < r; i++) {
+        printf("%d ", R[i]);
+    }
+    printf("\n");
 }
 
 int main(void) {
@@ -47,12 +57,12 @@ int main(void) {
         }
     }
 
-    while (scanf(" %c %d %d", &op, &param1, &param2)) {
+    while (scanf(" %c %d %d", &op, &param1, &param2) != EOF) {
         if (op == 's') {
             resultado = somar(v, R, r, param1, param2);
             printf("%d\n", resultado);
         } else if (op == 'a') {
-            atualizar(v, param1, param2);
+            atualizar(v, r, R, param1, param2);
         }
     }
     
