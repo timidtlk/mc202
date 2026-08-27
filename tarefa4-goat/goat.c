@@ -17,47 +17,53 @@ int is_vowel(char c) {
 
 int main(void) {
     char palavra[101];
-    char nova_palavra[201];
-    char frase[100000][200];
+    char* frase[200000];
     int soma = -1;
     int pointer = 1;
-    while (palavra[0] != '\n') {
-        scanf("%s", palavra);
+
+    while (scanf("%100s", palavra) == 1) {
         
         // regra 4
-        char num[6];
-        int num_pointer = 0;
-        int qtd_digitos = 0;
-        for(int i = 0; i < (int) strlen(palavra); i++) {
+        char limpa[101];
+        int idx_limpa = 0;
+        char num[101];
+        int num_idx = 0;
+
+        for (int i = 0; palavra[i] != '\0'; i++) {
             if (isdigit(palavra[i])) {
-                num[num_pointer++] = palavra[i];
-                qtd_digitos++;
-                continue;
-            } else if (num_pointer != 0) {
-                num[num_pointer] = '\0';
-                soma += atoi(num);
-                num_pointer = 0;
-            } else if (!isalnum(palavra[i])) {
-                soma = 0;
-                qtd_digitos++;
-            }
-            nova_palavra[i] = palavra[i+qtd_digitos];
-        }
-        strcpy(palavra, nova_palavra);
-        strcpy(nova_palavra, "");
-
-        //regra 2
-        if (!is_vowel(palavra[0])) {
-            char letra = palavra[0];
-
-            for (int i = 0; i < 200; i++) {
-                if (palavra[i+1] == '\0') {
-                    nova_palavra[i] = letra;
-                    break;
+                num[num_idx++] = palavra[i];
+            } else {
+                if (num_idx > 0) {
+                    num[num_idx] = '\0';
+                    if (soma == -1) soma = 0;
+                    soma += atoi(num);
+                    num_idx = 0;
                 }
-                nova_palavra[i] = palavra[i+1];
-                nova_palavra[i+1] = '\0';
+                if (isalpha(palavra[i])) {
+                    limpa[idx_limpa++] = palavra[i];
+                    if (soma == -1) soma = 0;
+                }
             }
+        }
+        if (num_idx > 0) {
+            num[num_idx] = '\0';
+            if (soma == -1) soma = 0;
+            soma += atoi(num);
+        }
+        limpa[idx_limpa] = '\0';
+        strcpy(palavra, limpa);
+
+        if (strlen(palavra) == 0) continue;
+
+        int tam_necessario = strlen(palavra) + 2 + pointer + 1;
+        char *nova_palavra = malloc(tam_necessario * sizeof(char));
+
+        if (!is_vowel(palavra[0])) {
+            // regra 2
+            strcpy(nova_palavra, palavra + 1);
+            int len = strlen(nova_palavra);
+            nova_palavra[len] = palavra[0];
+            nova_palavra[len + 1] = '\0';
         } else {
             // regra 1
             strcpy(nova_palavra, palavra);
@@ -65,20 +71,24 @@ int main(void) {
         strcat(nova_palavra, "ma");
 
         // regra 3
-        for(int i = 0; i < (int) strlen(palavra); i++) {
+        for (int i = 0; i < pointer; i++) {
             strcat(nova_palavra, "a");
         }
-
-        strcpy(frase[pointer++], nova_palavra);
+        frase[pointer++] = nova_palavra;
     }
     
-    if (soma != -1)
+    if (soma != -1) {
+        frase[0] = malloc(50 * sizeof(char));
         sprintf(frase[0], "%d goats say:", soma);
-    for (int i = 0; i < pointer; i++) {
-        if (!strcmp(frase[i], "")) {
-            printf("%s ", frase[i]);
-        }
+        printf("%s ", frase[0]);
+        free(frase[0]);
     }
 
+    for (int i = 1; i < pointer; i++) {
+        printf("%s%s", frase[i], (i == pointer - 1) ? "" : " ");
+        free(frase[i]);
+    }
     printf("\n");
+
+    return 0;
 }
